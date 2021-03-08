@@ -15,7 +15,7 @@ lower_bounds = [env.observation_space.low[2], -math.radians(50)]
 upper_bounds = [env.observation_space.high[2], -math.radians(50)]
 
 
-def discretizer(_, __, angle, pole_velocity) -> Tuple[int,...]:
+def discretizer(_, __, angle, pole_velocity) -> Tuple[int, ...]:
     est = KBinsDiscretizer(n_bins=n_bins, encode="ordinal", strategy="uniform")
     est.fit([lower_bounds, upper_bounds])
     return tuple(map(int, est.transform([[angle, pole_velocity]])[0]))
@@ -63,7 +63,7 @@ for e in range(n_episodes):
         if np.random.random() < exploration_rate(e):
             action = env.action_space.sample()  # explore
 
-        # increment enviroment
+        # increment environment
         obs, reward, done, _ = env.step(action)
         new_state = discretizer(*obs)
 
