@@ -10,7 +10,7 @@ env = gym.make('CartPole-v0')
 """Discretize the environment by turning the CartPole continuous space
 into a single discrete space."""
 
-n_bins = (6, 12)
+n_bins = (24, 48)
 lower_bounds = [env.observation_space.low[2], -math.radians(50)]
 upper_bounds = [env.observation_space.high[2], -math.radians(50)]
 
