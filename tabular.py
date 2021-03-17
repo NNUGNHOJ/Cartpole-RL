@@ -22,6 +22,7 @@ def discretizer(position, __, angle, pole_velocity) -> Tuple[int, ...]:
 
 
 """Initialize Q-table with zeros"""
+# TODO: experiment with filling with different values not just zeros.
 Q_table = np.zeros(n_bins + (env.action_space.n,))
 
 
@@ -76,6 +77,7 @@ for e in range(n_episodes):
 
         # Render the cartpole environment
         env.render()
+    print(e)
 
 
 
