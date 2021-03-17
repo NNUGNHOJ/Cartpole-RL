@@ -52,6 +52,8 @@ def exploration_rate(n: int, min_rate=0.001) -> float:
 n_episodes = 10000
 for e in range(n_episodes):
 
+    total=0
+
     # Discretize state into buckets
     current_state, done = discretizer(*env.reset()), False
 
@@ -66,7 +68,8 @@ for e in range(n_episodes):
         # increment environment
         obs, reward, done, _ = env.step(action)
         new_state = discretizer(*obs)
-        reward =  1/abs(obs[3]) * 1/abs(obs[2])
+        total += reward # experiment
+        reward =  1/abs(obs[3]) * 1/abs(obs[2]) # why do we do the reward like this?
 
         # Update Q-Table
         lr = learning_rate(e)
@@ -77,7 +80,7 @@ for e in range(n_episodes):
 
         # Render the cartpole environment
         env.render()
-    print(e)
+    print(total)
 
 
 
