@@ -3,6 +3,7 @@ import time, math, random
 import numpy as np
 import tensorflow as tf
 import torch
+from torch.autograd import Variable
 from tensorflow import keras
 from sklearn.preprocessing import KBinsDiscretizer
 from typing import Tuple
@@ -20,6 +21,16 @@ class DQLAgent:
             torch.nn.Linear(hidden_dim*2, action_dim))
         
         self.optimizer = torch.optim.Adam(self.model.parameters(), l_rate)
+
+    # TODO: annotate
+    def update(self, state, y):
+        """Update the weights of the network given a training sample. """
+        y_pred = self.model(torch.Tensor(state))
+        loss = self.criterion(y_pred, Variable(torch.Tensor(y)))
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
+
 
     # TODO: annotate
     def predict(self, state):
@@ -46,9 +57,10 @@ into a single discrete space."""
 #     return tuple(map(int, est.transform([[angle, (pole_velocity)]])[0]))
 
 """Training..."""
-epsilon = 0.3
+epsilon = 0.1
 n_episodes = 10000
-
+eps_decay = 0.99
+gamma=.9
 # Number of states
 n_state = env.observation_space.shape[0]
 # Number of actions
@@ -73,10 +85,19 @@ for e in range(n_episodes):
             q_values = model.predict(state)
             action = torch.argmax(q_values).item() 
 
+        # Take action and add reward to total
+        next_state, reward, done, _ = env.step(action)
         # increment environment
-        obs, reward, done, _ = env.step(action)
+        # obs, reward, done, _ = env.step(action)
+        q_values = model.predict(state).tolist()
+        # model.update(state, q_values)
+        q_values_next = model.predict(next_state)
+        q_values[action] = reward + gamma * torch.max(q_values_next).item()
+        model.update(state, q_values)
+        state = next_state
 
         env.render()
+    epsilon = max(epsilon * eps_decay, 0.01)
     print(e)
 
 
