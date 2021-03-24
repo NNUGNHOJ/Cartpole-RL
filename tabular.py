@@ -139,12 +139,27 @@ def run_experiment():
     print(df.shape)
 
     for bin_size in bin_sizes:
-        train_specific((bin_size, 6), n_episodes, df)
+        train_specific((bin_size, 4), n_episodes, df)
 
     df.to_pickle('tabular_bins_experiment')
     return
 
 
-run_experiment()
+def run_experiment_2():
+    n_episodes = 1000
 
-#df = pd.read_pickle('tabular_bins_experiment')
+    df = pd.DataFrame(index=range(n_episodes), columns=['12'])
+    bin_sizes = [12]
+
+    print(df.shape)
+
+    for bin_size in bin_sizes:
+        train_specific((bin_size, 4), n_episodes, df)
+
+    df.to_pickle('tabular_bins_experiment_2')
+    return
+
+
+run_experiment_2()
+
+
