@@ -67,7 +67,7 @@ def train_default():
             obs, reward, done, _ = env.step(action)
             new_state = discretizer(*obs, lower_bounds, upper_bounds, n_bins)
             total += reward # experiment
-            reward =  1/abs(obs[3]) * 1/abs(obs[2]) # why do we do the reward like this?
+            reward = 1/abs(obs[3]) * 1/abs(obs[2]) # why do we do the reward like this?
 
             # Update Q-Table
             lr = learning_rate(e)
@@ -85,6 +85,9 @@ def train_default():
 def train_specific(n_bins, n_episodes, df):
     """Training with set bin size..."""
     env = gym.make('CartPole-v1')
+    #print('obs..')
+    #print(env.observation_space)
+    #print('end obs..')
     lower_bounds = [env.observation_space.low[2] / 3, -1]
     upper_bounds = [env.observation_space.high[2] / 3, 1]
 
@@ -108,6 +111,7 @@ def train_specific(n_bins, n_episodes, df):
 
             # increment environment
             obs, reward, done, _ = env.step(action)
+            #print('obs length: ' + str(obs))
             new_state = discretizer(*obs, lower_bounds, upper_bounds, n_bins)
             total += reward  # experiment
             reward = 1 / abs(obs[3]) * 1 / abs(obs[2])  # why do we do the reward like this?
@@ -122,10 +126,14 @@ def train_specific(n_bins, n_episodes, df):
             # Render the cartpole environment
             #env.render()
 
-        df.at[e, str(n_bins[0])] = total
+        df.at[e, str(n_bins[0]) + '_' + str(n_bins[1])] = total
         print(df)
-        print(total)
+        #print(total)
 
+        #print(Q_table[0][0][0])
+        #print(Q_table[1][0][0])
+        #print(Q_table[2][0][0])
+        #print(Q_table[3][0][0])
 
     return df
 
@@ -133,20 +141,22 @@ def train_specific(n_bins, n_episodes, df):
 def run_experiment():
     n_episodes = 1000
 
-    df = pd.DataFrame(index=range(n_episodes), columns=['3', '6', '12', '24', '48', '96', '192'])
-    bin_sizes = [3, 6, 12, 24, 48, 96, 192]
+    df = pd.DataFrame(index=range(n_episodes))
+    bin_sizes0 = [3, 6, 12, 24, 48, 96, 192]
+    bin_sizes1 = [3, 6, 12, 24, 48, 96, 192]
 
     print(df.shape)
 
-    for bin_size in bin_sizes:
-        train_specific((bin_size, 4), n_episodes, df)
+    for bin_size0 in bin_sizes0:
+        for bin_size1 in bin_sizes1:
+            train_specific((bin_size0, bin_size1), n_episodes, df)
 
-    df.to_pickle('tabular_bins_experiment')
+    df.to_pickle('tabular_bins_experiment_comb')
     return
 
 
 def run_experiment_2():
-    n_episodes = 1000
+    n_episodes = 1
 
     df = pd.DataFrame(index=range(n_episodes), columns=['12'])
     bin_sizes = [12]
@@ -156,10 +166,10 @@ def run_experiment_2():
     for bin_size in bin_sizes:
         train_specific((bin_size, 4), n_episodes, df)
 
-    df.to_pickle('tabular_bins_experiment_2')
+    #df.to_pickle('tabular_bins_experiment_2')
     return
 
 
-run_experiment_2()
+run_experiment()
 
 
